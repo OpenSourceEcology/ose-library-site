@@ -13,6 +13,12 @@ _PACKAGE_PARENT = str(Path(__file__).resolve().parent.parent)
 if _PACKAGE_PARENT not in sys.path:
     sys.path.insert(0, _PACKAGE_PARENT)
 
+# freecadcmd ignores PYTHONPATH, so the parent process passes the libtools
+# install location explicitly and it is bootstrapped here before import.
+_LIBTOOLS_PATH = os.environ.get("OSE_SITE_LIBTOOLS_PATH")
+if _LIBTOOLS_PATH and _LIBTOOLS_PATH not in sys.path:
+    sys.path.insert(0, _LIBTOOLS_PATH)
+
 from libtools import compile_entry
 from libtools.output_validator import failure_report, validate_output
 from libtools.registry import Entry, discover, load_schema
@@ -48,6 +54,7 @@ def driver_env(
     pythonpath_parts = [str(package_parent), str(site_parent), str(Path(root).resolve())]
     env.update(
         {
+            "OSE_SITE_LIBTOOLS_PATH": str(package_parent),
             "OSE_SITE_ROOT": str(root),
             "OSE_SITE_ENTRY": entry.id,
             "OSE_SITE_OUT": str(out_dir),

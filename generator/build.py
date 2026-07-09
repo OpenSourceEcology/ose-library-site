@@ -125,6 +125,15 @@ def _build_library(
                 write_report(report, reports_code)
                 _run_freecad(entry, library_root, meshes_dir, reports_output, slots_dir)
 
+        if not skip_freecad and entries:
+            produced = list(Path(meshes_dir).glob("*.stl"))
+            if not produced:
+                raise SystemExit(
+                    f"{library['name']}: FreeCAD pass produced no meshes for any of "
+                    f"{len(entries)} entries — refusing to publish placeholder pages. "
+                    "Check the freecadcmd driver output above."
+                )
+
         rendered_entries = []
         for entry in entries:
             rendered_entries.append(
