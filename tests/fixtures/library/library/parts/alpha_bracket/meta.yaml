@@ -1,0 +1,25 @@
+id: alpha_bracket
+layer: part
+title: Alpha bracket
+owner: Ada
+license: OSE
+version: 0.1.0
+status: active
+provenance:
+  author: Ada
+  source: bench note
+interface:
+  system: fixture
+  role: wall
+  width_in: 10
+  depth_in: 2
+  height_in: 3
+  exterior_face: +x
+slots:
+  icon: null
+  fab_drawing: null
+  bom: null
+  cheatsheet: null
+known_issues:
+  - Needs fixture review before shop use.
+

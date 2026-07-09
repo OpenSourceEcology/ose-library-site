@@ -1,0 +1,22 @@
+id: gamma_plate
+layer: part
+title: Gamma plate
+owner: Gus
+license: OSE
+version: 0.1.0
+status: active
+provenance:
+  author: Gus
+interface:
+  system: fixture
+  role: floor
+  width_in: 8
+  depth_in: 4
+  height_in: 1
+  exterior_face: +x
+slots:
+  icon: null
+  fab_drawing: null
+  bom: null
+  cheatsheet: null
+

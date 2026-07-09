@@ -1,0 +1,192 @@
+{% extends "base.html" %}
+{% set asset_prefix = "../../../" %}
+{% set root_href = "../../../index.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block head %}
+{% if mesh_available %}
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.165.0/examples/jsm/"
+  }
+}
+</script>
+{% endif %}
+{% endblock %}
+{% block content %}
+<nav class="crumbs" aria-label="Breadcrumb">
+  <a href="../../index.html">{{ library.name }}</a>
+  <a href="../index.html">{{ entry.layer }}</a>
+  <span>{{ entry.id }}</span>
+</nav>
+
+<article class="entry-page">
+  <header class="entry-head">
+    <div>
+      <p class="mono">{{ entry.id }}</p>
+      <h1>{{ title }}</h1>
+      <dl class="meta-line">
+        <div><dt>Layer</dt><dd>{{ entry.layer }}</dd></div>
+        <div><dt>Status</dt><dd>{{ badges.status }}</dd></div>
+        <div><dt>Owner</dt><dd>{{ meta.owner }}</dd></div>
+        <div><dt>Version</dt><dd>{{ meta.version }}</dd></div>
+      </dl>
+    </div>
+    <div class="badges large" aria-label="Validation status">
+      <span class="badge {{ badges.code.state }}">code {{ badges.code.label }}</span>
+      <span class="badge {{ badges.output.state }}">output {{ badges.output.label }}</span>
+    </div>
+  </header>
+
+  <section class="viewer-section" aria-labelledby="viewer-heading">
+    <div class="section-title">
+      <h2 id="viewer-heading">3D View</h2>
+      <p>
+        {% if dimensions %}
+        Envelope: {{ dimensions.x|default("?") }} x {{ dimensions.y|default("?") }} x {{ dimensions.z|default("?") }} in
+        {% else %}
+        Envelope not declared
+        {% endif %}
+      </p>
+    </div>
+    {% if mesh_available %}
+    <div class="viewer" data-stl="{{ files.stl }}" data-dimensions='{{ dimensions | tojson }}'>
+      <p class="viewer-fallback">Mesh available: <a href="{{ files.stl }}">download STL</a>.</p>
+    </div>
+    {% else %}
+    <div class="mesh-placeholder" role="img" aria-label="Mesh pending placeholder">
+      <strong>mesh pending</strong>
+      <span>3D output has not been generated for this entry.</span>
+    </div>
+    {% endif %}
+  </section>
+
+  <section aria-labelledby="parameters-heading">
+    <div class="section-title">
+      <h2 id="parameters-heading">Parameters</h2>
+      <p><a href="{{ files.json }}">Download exported JSON</a> · <a href="{{ files.schema }}">schema.py</a> · <a href="{{ files.compiler }}">compiler.py</a></p>
+    </div>
+    {% for group in parameters %}
+    <h3>{{ group.name }}</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th scope="col">Parameter</th><th scope="col">Value</th></tr></thead>
+        <tbody>
+          {% for row in group.rows %}
+          <tr><th scope="row"><code>{{ row.key }}</code></th><td>{{ row.value }}</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% endfor %}
+  </section>
+
+  <section aria-labelledby="fab-heading">
+    <div class="section-title">
+      <h2 id="fab-heading">Fabrication Drawing</h2>
+      <p>{% if fab_svg %}Generated SVG{% else %}No slot drawing found{% endif %}</p>
+    </div>
+    {% if fab_svg %}
+    <div class="fab-object" role="img" aria-label="Fabrication drawing for {{ title }}">{{ fab_svg | safe }}</div>
+    {% else %}
+    <p class="empty">Fabrication drawing pending.</p>
+    {% endif %}
+  </section>
+
+  <section aria-labelledby="bom-heading">
+    <div class="section-title">
+      <h2 id="bom-heading">BOM</h2>
+      <p>{% if files.bom %}<a href="{{ files.bom }}">Download CSV</a>{% else %}No BOM CSV found{% endif %}</p>
+    </div>
+    {% if bom_rows %}
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            {% for key in bom_rows[0].keys() %}
+            <th scope="col">{{ key.replace("_", " ") }}</th>
+            {% endfor %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in bom_rows %}
+          <tr>
+            {% for value in row.values() %}
+            <td>{{ value }}</td>
+            {% endfor %}
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <p class="empty">BOM pending.</p>
+    {% endif %}
+  </section>
+
+  <section class="split">
+    <div>
+      <h2>Validation</h2>
+      <h3>Code</h3>
+      <ul class="check-list">
+        {% for check in checks.code %}
+        <li class="{{ 'ok' if check.passed else 'bad' }}"><span>{{ check.name }}</span><small>{{ check.detail }}</small></li>
+        {% else %}
+        <li><span>not yet validated</span></li>
+        {% endfor %}
+      </ul>
+      <h3>Output</h3>
+      <ul class="check-list">
+        {% for check in checks.output %}
+        <li class="{{ 'ok' if check.passed else 'bad' }}"><span>{{ check.name }}</span><small>{{ check.detail }}</small></li>
+        {% else %}
+        <li><span>not yet validated</span></li>
+        {% endfor %}
+      </ul>
+    </div>
+    <div>
+      <h2>Provenance</h2>
+      <dl class="stacked">
+        {% for key, value in provenance.items() %}
+        <div><dt>{{ key }}</dt><dd>{{ value }}</dd></div>
+        {% endfor %}
+      </dl>
+      <h2>Interface</h2>
+      <dl class="stacked">
+        {% for key, value in interface.items() %}
+        <div><dt>{{ key }}</dt><dd>{{ value }}</dd></div>
+        {% endfor %}
+      </dl>
+    </div>
+  </section>
+
+  <section aria-labelledby="issues-heading">
+    <h2 id="issues-heading">Known Issues</h2>
+    {% if known_issues %}
+    <ul class="ruled-list text">
+      {% for issue in known_issues %}
+      <li>{{ issue }}</li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p class="empty">No known issues listed.</p>
+    {% endif %}
+  </section>
+
+  <section class="contribute" aria-labelledby="contribute-heading">
+    <h2 id="contribute-heading">Contribute</h2>
+    <p>{{ meta.owner }} is the listed reviewer for this entry.</p>
+    <p>
+      {% if links.entry_source %}<a href="{{ links.entry_source }}">Entry source</a>{% endif %}
+      {% if links.contributing %} · <a href="{{ links.contributing }}">Contributing guide</a>{% endif %}
+    </p>
+  </section>
+</article>
+{% endblock %}
+{% block scripts %}
+{% if mesh_available %}
+<script type="module" src="../../../assets/viewer.js"></script>
+{% endif %}
+{% endblock %}
+

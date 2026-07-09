@@ -1,0 +1,11 @@
+envelope:
+  bbox_in:
+    x: [0, 10]
+    y: [0, 2]
+    z: [0, 3]
+  tolerance_in: 0.125
+params:
+  - key: width_in
+    min: 1
+    max: 12
+

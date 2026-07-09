@@ -1,0 +1,9 @@
+Metadata-Version: 2.4
+Name: ose-library-site
+Version: 0.1.0
+Requires-Python: >=3.11
+Requires-Dist: PyYAML
+Requires-Dist: jinja2
+Requires-Dist: libtools @ git+https://github.com/OpenSourceEcology/vcs-library
+Provides-Extra: dev
+Requires-Dist: pytest; extra == "dev"

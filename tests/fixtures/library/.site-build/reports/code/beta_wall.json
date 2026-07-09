@@ -1,0 +1,11 @@
+{
+  "id": "beta_wall",
+  "layer": "module",
+  "status": "wip",
+  "tier": "code",
+  "checks": [
+    {"name": "compiler_contract", "passed": false, "detail": "fixture report-only code failure"}
+  ],
+  "passed": false
+}
+

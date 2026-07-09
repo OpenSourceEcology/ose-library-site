@@ -1,0 +1,6 @@
+PyYAML
+jinja2
+libtools @ git+https://github.com/OpenSourceEcology/vcs-library
+
+[dev]
+pytest

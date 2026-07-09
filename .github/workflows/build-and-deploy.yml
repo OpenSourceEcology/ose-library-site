@@ -1,0 +1,69 @@
+name: build-and-deploy
+
+on:
+  push:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 9 * * *"
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install FreeCAD
+        run: |
+          sudo add-apt-repository -y ppa:freecad-maintainers/freecad-stable
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq freecad
+          command -v freecadcmd
+
+      - name: Install generator dependencies
+        run: |
+          python3 -m pip install --break-system-packages pytest jinja2 PyYAML 'libtools @ git+https://github.com/OpenSourceEcology/vcs-library'
+
+      - name: Clone configured libraries
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import subprocess
+          import yaml
+
+          config = yaml.safe_load(Path("config.yaml").read_text(encoding="utf-8"))
+          root = Path(".libraries")
+          root.mkdir(exist_ok=True)
+          for library in config["libraries"]:
+              dest = root / library["name"]
+              cmd = ["git", "clone", "--depth", "1"]
+              if library.get("ref"):
+                  cmd += ["--branch", str(library["ref"])]
+              cmd += [library["git"], str(dest)]
+              subprocess.run(cmd, check=True)
+              library["path"] = str(dest)
+          Path(".ci.config.yaml").write_text(yaml.safe_dump(config, sort_keys=False), encoding="utf-8")
+          PY
+
+      - name: Test
+        run: python3 -m pytest -q
+
+      - name: Build site
+        run: python3 -m generator.build --config .ci.config.yaml --out site
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+      - uses: actions/deploy-pages@v4
+

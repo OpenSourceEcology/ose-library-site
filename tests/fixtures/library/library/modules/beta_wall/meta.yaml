@@ -1,0 +1,25 @@
+id: beta_wall
+layer: module
+title: Beta wall
+owner: Bea
+license: OSE
+version: 0.2.0
+status: wip
+provenance:
+  author: Bea
+  source: fixture
+interface:
+  system: fixture
+  role: wall
+  width_in: 48
+  depth_in: 6
+  height_in: 96
+  exterior_face: -y
+slots:
+  icon: null
+  fab_drawing: null
+  bom: null
+  cheatsheet: null
+known_issues:
+  - Door rough opening is intentionally omitted in fixture.
+

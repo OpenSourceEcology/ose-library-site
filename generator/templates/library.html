@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% set asset_prefix = "../" %}
+{% set root_href = "../index.html" %}
+{% block title %}{{ library.name }}{% endblock %}
+{% block content %}
+<section class="hero compact">
+  <div>
+    <p class="mono">Library</p>
+    <h1>{{ library.name }}</h1>
+  </div>
+  <p class="lede">{{ library.subtitle }}</p>
+</section>
+
+<section class="stat-grid" aria-label="Library summary">
+  <div><span class="label">Entries</span><strong>{{ total }}</strong></div>
+  {% for layer in layers %}
+  <div><span class="label">{{ layer }}</span><strong>{{ counts[layer] }}</strong></div>
+  {% endfor %}
+  <div><span class="label">Validation pass</span><strong>{{ validation["pass"] }}</strong></div>
+</section>
+
+<section class="split">
+  <div>
+    <h2>Layers</h2>
+    <ul class="ruled-list">
+      {% for layer in layers %}
+      <li><a href="{{ layer }}/index.html">{{ layer }}</a><span>{{ counts[layer] }} entries</span></li>
+      {% endfor %}
+    </ul>
+  </div>
+  <div>
+    <h2>Owners</h2>
+    <ul class="ruled-list">
+      {% for owner, count in owners.items() %}
+      <li>{{ owner }}<span>{{ count }} entries</span></li>
+      {% endfor %}
+    </ul>
+  </div>
+</section>
+
+<section>
+  <h2>Entries</h2>
+  <div class="entry-grid">
+    {% for item in entries %}
+    <article class="entry-card">
+      <a href="{{ item.href }}"><h3>{{ item.title }}</h3></a>
+      <p><code>{{ item.entry.id }}</code> · {{ item.entry.layer }}</p>
+      <div class="badges">
+        <span class="badge {{ item.badges.code.state }}">code {{ item.badges.code.label }}</span>
+        <span class="badge {{ item.badges.output.state }}">output {{ item.badges.output.label }}</span>
+      </div>
+    </article>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}
+

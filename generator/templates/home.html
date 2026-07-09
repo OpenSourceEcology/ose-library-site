@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% set asset_prefix = "" %}
+{% set root_href = "index.html" %}
+{% block title %}OSE Library Site{% endblock %}
+{% block content %}
+<section class="hero">
+  <div>
+    <p class="mono">Configured Libraries</p>
+    <h1>OSE Library Site</h1>
+  </div>
+  <p class="lede">Browsable shop-drawing pages generated directly from library entries, validation reports, meshes, fabrication drawings, and BOM outputs.</p>
+</section>
+
+<section class="index-list" aria-labelledby="libraries-heading">
+  <h2 id="libraries-heading">Libraries</h2>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th scope="col">Library</th>
+          <th scope="col">Entries</th>
+          <th scope="col">Reference</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for library in libraries %}
+        <tr>
+          <td><a href="{{ library.name }}/index.html">{{ library.name }}</a><br><span>{{ library.subtitle }}</span></td>
+          <td>{{ library.entries|length }}</td>
+          <td><code>{{ library.ref or "local" }}</code></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}
+

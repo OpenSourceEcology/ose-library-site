@@ -1,0 +1,11 @@
+{
+  "id": "beta_wall",
+  "layer": "module",
+  "status": "wip",
+  "tier": "output",
+  "checks": [
+    {"name": "overlap", "passed": false, "detail": "fixture report-only output failure"}
+  ],
+  "passed": false
+}
+

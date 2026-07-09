@@ -1,0 +1,8 @@
+envelope:
+  bbox_in:
+    x: [0, 8]
+    y: [0, 4]
+    z: [0, 1]
+  tolerance_in: 0.125
+params: []
+

@@ -1,0 +1,12 @@
+libraries:
+  - name: fixture-library
+    path: tests/fixtures/library
+    git: https://example.invalid/fixture-library
+    ref: main
+    subtitle: Fixture entries for generator tests.
+  - name: second-library
+    path: tests/fixtures/second-library
+    git: https://example.invalid/second-library
+    ref: main
+    subtitle: Second fixture library for layout tests.
+

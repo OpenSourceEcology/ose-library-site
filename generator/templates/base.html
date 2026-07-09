@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}OSE Library Site{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ asset_prefix | default('') }}assets/site.css">
+  {% block head %}{% endblock %}
+</head>
+<body>
+  <a class="skip-link" href="#content">Skip to content</a>
+  <header class="site-header">
+    <a class="brand" href="{{ root_href | default('index.html') }}">
+      <span class="brand-mark">OSE</span>
+      <span>Library Site</span>
+    </a>
+    <nav aria-label="Primary">
+      <a href="{{ root_href | default('index.html') }}">Libraries</a>
+      <a href="{{ asset_prefix | default('') }}site-index.json">Index JSON</a>
+    </nav>
+  </header>
+  <main id="content">
+    {% block content %}{% endblock %}
+  </main>
+  <footer class="title-block">
+    <div>
+      <span class="label">System</span>
+      <strong>Open Source Ecology Library</strong>
+    </div>
+    <div>
+      <span class="label">Output</span>
+      <strong>Static HTML</strong>
+    </div>
+    <div>
+      <span class="label">Units</span>
+      <strong>Inches</strong>
+    </div>
+  </footer>
+  {% block scripts %}{% endblock %}
+</body>
+</html>
+

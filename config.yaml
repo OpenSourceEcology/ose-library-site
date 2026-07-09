@@ -1,0 +1,6 @@
+libraries:
+  - name: vcs-library
+    git: https://github.com/OpenSourceEcology/vcs-library
+    ref: main
+    subtitle: Parametric library entries for the Village Construction Set.
+

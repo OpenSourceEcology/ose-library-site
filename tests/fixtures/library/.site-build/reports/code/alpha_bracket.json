@@ -1,0 +1,11 @@
+{
+  "id": "alpha_bracket",
+  "layer": "part",
+  "status": "active",
+  "tier": "code",
+  "checks": [
+    {"name": "schema_data_only", "passed": true, "detail": ""}
+  ],
+  "passed": true
+}
+

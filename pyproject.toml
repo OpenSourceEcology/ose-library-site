@@ -1,0 +1,16 @@
+[project]
+name = "ose-library-site"
+version = "0.1.0"
+requires-python = ">=3.11"
+dependencies = [
+  "PyYAML",
+  "jinja2",
+  "libtools @ git+https://github.com/OpenSourceEcology/vcs-library",
+]
+
+[project.optional-dependencies]
+dev = ["pytest"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+

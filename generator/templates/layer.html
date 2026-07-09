@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% set asset_prefix = "../../" %}
+{% set root_href = "../../index.html" %}
+{% block title %}{{ library.name }} {{ layer }}{% endblock %}
+{% block content %}
+<nav class="crumbs" aria-label="Breadcrumb">
+  <a href="../index.html">{{ library.name }}</a>
+  <span>{{ layer }}</span>
+</nav>
+<section class="hero compact">
+  <div>
+    <p class="mono">Layer Index</p>
+    <h1>{{ layer }}</h1>
+  </div>
+  <p class="lede">{{ entries|length }} generated entry pages.</p>
+</section>
+<section>
+  <div class="entry-grid">
+    {% for item in entries %}
+    <article class="entry-card">
+      <a href="{{ item.entry.id }}/index.html"><h2>{{ item.title }}</h2></a>
+      <p><code>{{ item.entry.id }}</code></p>
+      <p>{{ item.meta.owner }} · {{ item.meta.version }}</p>
+      <div class="badges">
+        <span class="badge {{ item.badges.code.state }}">code {{ item.badges.code.label }}</span>
+        <span class="badge {{ item.badges.output.state }}">output {{ item.badges.output.label }}</span>
+      </div>
+    </article>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}
+

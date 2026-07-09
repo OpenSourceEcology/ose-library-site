@@ -1,0 +1,11 @@
+{
+  "id": "alpha_bracket",
+  "layer": "part",
+  "status": "active",
+  "tier": "output",
+  "checks": [
+    {"name": "fit", "passed": false, "detail": "fixture fit failure"}
+  ],
+  "passed": false
+}
+
