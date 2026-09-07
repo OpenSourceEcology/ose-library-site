@@ -1,2 +1,6 @@
 __pycache__/
 *.pyc
+site/
+.venv/
+.pytest_cache/
+.local.config.yaml
