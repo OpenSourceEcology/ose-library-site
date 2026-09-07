@@ -51,11 +51,15 @@ def driver_env(
 
     package_parent = Path(compile_entry.__file__).resolve().parent.parent
     site_parent = Path(__file__).resolve().parent.parent
-    pythonpath_parts = [str(package_parent), str(site_parent), str(Path(root).resolve())]
+    # ``root`` is the configured collection root, which may be a subdirectory
+    # of a shared repository checkout. Put it on both FreeCAD's bootstrap path
+    # and the driver environment so collection-local compiler helpers import.
+    collection_root = Path(root).resolve()
+    pythonpath_parts = [str(package_parent), str(site_parent), str(collection_root)]
     env.update(
         {
             "OSE_SITE_LIBTOOLS_PATH": str(package_parent),
-            "OSE_SITE_ROOT": str(root),
+            "OSE_SITE_ROOT": str(collection_root),
             "OSE_SITE_ENTRY": entry.id,
             "OSE_SITE_OUT": str(out_dir),
             "OSE_SITE_REPORTS": str(reports_dir),
@@ -139,4 +143,3 @@ if __name__ != "generator.freecad_pass" and os.environ.get("OSE_SITE_ENTRY"):
     sys.exit(main())
 elif __name__ == "__main__":
     sys.exit(main())
-

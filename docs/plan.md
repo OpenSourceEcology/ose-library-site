@@ -22,6 +22,17 @@ Principles:
   title-block footers. The library should read like a drawer of shop
   drawings, not a SaaS landing page.
 
+## Configured collections
+
+Each `config.yaml` library may optionally set `subdir` to publish a collection
+inside a repository checkout. The generator resolves that value only as a
+relative descendant of the clone, then uses the collection root for discovery
+and FreeCAD imports. Source-directory links include the collection subdirectory;
+repository-level documentation links, such as `CONTRIBUTING.md`, stay at the
+repository root. The `gvcs-library` collection also links to the Iconic CAD
+machine workbench for source geometry inspection at
+`https://opensourceecology.github.io/iconic-cad/machines.html`.
+
 ## Build pipeline (CI, FreeCAD required)
 
 For each configured library (git url + ref):
@@ -30,7 +41,9 @@ For each configured library (git url + ref):
 2. Run `validate-code` and `validate-output` (freecadcmd; system python —
    see vcs-library's output-validate.yml for the known CI pitfalls) —
    reports feed the badges. A failing entry still gets a page, marked
-   failing; the site build itself only fails on generator errors.
+   failing. The build refuses to publish a non-skipped entry whose FreeCAD
+   compilation did not produce its STL, so a compiler failure cannot silently
+   become a placeholder page.
 3. Export meshes: in the same freecadcmd pass that compiles each entry,
    export binary STL per entry (FreeCAD Mesh; sensible tessellation
    tolerance) for the 3D viewer.
@@ -62,7 +75,7 @@ For each configured library (git url + ref):
 
 ```
 generator/            # python package: build.py, render.py, templates/, assets/
-config.yaml           # libraries: [{name, git, ref, subtitle}]
+config.yaml           # libraries: [{name, git, ref, subtitle, subdir?}]
 tests/                # pure-logic tests + a fixture library (entry contract, fake outputs)
 .github/workflows/
   build-and-deploy.yml  # FreeCAD PPA; build all libraries; deploy-pages

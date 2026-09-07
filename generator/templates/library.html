@@ -9,6 +9,9 @@
     <h1>{{ library.name }}</h1>
   </div>
   <p class="lede">{{ library.subtitle }}</p>
+  {% if library.workbench_url %}
+  <p class="lede"><a href="{{ library.workbench_url }}">Open this collection in the Iconic CAD machine workbench</a></p>
+  {% endif %}
 </section>
 
 <section class="stat-grid" aria-label="Library summary">
@@ -54,4 +57,3 @@
   </div>
 </section>
 {% endblock %}
-

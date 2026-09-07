@@ -180,6 +180,7 @@
     <p>
       {% if links.entry_source %}<a href="{{ links.entry_source }}">Entry source</a>{% endif %}
       {% if links.contributing %} · <a href="{{ links.contributing }}">Contributing guide</a>{% endif %}
+      {% if library.workbench_url %} · <a href="{{ library.workbench_url }}">Iconic CAD machine workbench</a>{% endif %}
     </p>
   </section>
 </article>
@@ -189,4 +190,3 @@
 <script type="module" src="../../../assets/viewer.js"></script>
 {% endif %}
 {% endblock %}
-

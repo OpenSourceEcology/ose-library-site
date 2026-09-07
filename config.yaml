@@ -3,4 +3,9 @@ libraries:
     git: https://github.com/OpenSourceEcology/vcs-library
     ref: main
     subtitle: Parametric library entries for the Village Construction Set.
-
+  - name: gvcs-library
+    git: https://github.com/OpenSourceEcology/vcs-library
+    ref: main
+    subdir: collections/gvcs
+    subtitle: GVCS source entries with recorded provenance and review status.
+    workbench_url: https://opensourceecology.github.io/iconic-cad/machines.html

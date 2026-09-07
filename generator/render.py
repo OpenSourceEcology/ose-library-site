@@ -52,18 +52,26 @@ def badge_state(report: dict[str, Any] | None, entry_status: str) -> dict[str, s
             "detail": "No validation report was found.",
         }
     failed = [check for check in report.get("checks", []) if not check.get("passed")]
-    if report.get("passed") is True or not failed:
+    if report.get("passed") is True:
         return {"state": "pass", "label": "pass", "detail": "All checks passed."}
+    if report.get("passed") is not False and not failed:
+        return {"state": "pass", "label": "pass", "detail": "All checks passed."}
+    count = len(failed)
+    detail = (
+        "Validation report declares failure."
+        if not count
+        else f"{count} failing check(s)."
+    )
     if entry_status == "wip":
         return {
             "state": "report-only",
             "label": "report-only",
-            "detail": f"{len(failed)} failing check(s); WIP entries do not fail the library.",
+            "detail": f"{detail} WIP entries do not fail the library.",
         }
     return {
         "state": "fail",
         "label": "fail",
-        "detail": f"{len(failed)} failing check(s).",
+        "detail": detail,
     }
 
 
@@ -235,4 +243,3 @@ def format_value(value: Any) -> str:
     if isinstance(value, dict):
         return json.dumps(value, sort_keys=True)
     return str(value)
-

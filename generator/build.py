@@ -66,16 +66,44 @@ def main(argv: Sequence[str] | None = None) -> int:
 
 def _prepare_library(config: dict[str, Any], work_root: Path) -> Path:
     if config.get("path"):
-        return Path(config["path"]).resolve()
+        checkout_root = Path(config["path"]).resolve()
+    else:
+        name = config["name"]
+        checkout_root = work_root / name
+        cmd = ["git", "clone", "--depth", "1"]
+        if config.get("ref"):
+            cmd.extend(["--branch", str(config["ref"])])
+        cmd.extend([config["git"], str(checkout_root)])
+        subprocess.run(cmd, check=True)
 
-    name = config["name"]
-    dest = work_root / name
-    cmd = ["git", "clone", "--depth", "1"]
-    if config.get("ref"):
-        cmd.extend(["--branch", str(config["ref"])])
-    cmd.extend([config["git"], str(dest)])
-    subprocess.run(cmd, check=True)
-    return dest
+    return _collection_root(checkout_root, config.get("subdir"))
+
+
+def _collection_root(checkout_root: Path, subdir: Any) -> Path:
+    """Return a configured collection below a checked-out library safely.
+
+    A collection is allowed to select a descendant of a repository checkout,
+    never an absolute path or a path which can escape that checkout.
+    """
+    checkout_root = checkout_root.resolve()
+    if not checkout_root.is_dir():
+        raise ValueError(f"library checkout does not exist: {checkout_root}")
+    if subdir is None or subdir == "":
+        return checkout_root
+    if not isinstance(subdir, str):
+        raise ValueError("library subdir must be a relative string")
+
+    relative = Path(subdir)
+    if relative.is_absolute() or ".." in relative.parts:
+        raise ValueError(f"library subdir must remain inside its checkout: {subdir!r}")
+    collection_root = (checkout_root / relative).resolve()
+    try:
+        collection_root.relative_to(checkout_root)
+    except ValueError as exc:
+        raise ValueError(f"library subdir escapes its checkout: {subdir!r}") from exc
+    if not collection_root.is_dir():
+        raise ValueError(f"library subdir does not exist: {subdir!r}")
+    return collection_root
 
 
 def _build_library(
@@ -96,6 +124,8 @@ def _build_library(
         "subtitle": config.get("subtitle", ""),
         "git": config.get("git", ""),
         "ref": config.get("ref", ""),
+        "subdir": config.get("subdir", ""),
+        "workbench_url": config.get("workbench_url", ""),
         "root": str(library_root),
     }
 
@@ -126,12 +156,12 @@ def _build_library(
                 _run_freecad(entry, library_root, meshes_dir, reports_output, slots_dir)
 
         if not skip_freecad and entries:
-            produced = list(Path(meshes_dir).glob("*.stl"))
-            if not produced:
+            missing = [entry.id for entry in entries if not (meshes_dir / f"{entry.id}.stl").is_file()]
+            if missing:
                 raise SystemExit(
-                    f"{library['name']}: FreeCAD pass produced no meshes for any of "
-                    f"{len(entries)} entries — refusing to publish placeholder pages. "
-                    "Check the freecadcmd driver output above."
+                    f"{library['name']}: FreeCAD pass did not produce mesh output for "
+                    f"{', '.join(missing)} — refusing to publish placeholder pages. "
+                    "Check the freecadcmd driver output and its per-entry validation reports above."
                 )
 
         rendered_entries = []
@@ -261,7 +291,8 @@ def _source_url(library: dict[str, Any], entry: dict[str, Any]) -> str | None:
     if not git.startswith("http"):
         return None
     ref = library.get("ref") or "main"
-    return f"{git.rstrip('/')}/tree/{ref}/library/{entry['layer']}s/{entry['id']}"
+    source_path = _collection_source_path(library, "library", f"{entry['layer']}s", entry["id"])
+    return f"{git.rstrip('/')}/tree/{ref}/{source_path}"
 
 
 def _doc_url(library: dict[str, Any], filename: str) -> str | None:
@@ -269,7 +300,24 @@ def _doc_url(library: dict[str, Any], filename: str) -> str | None:
     if not git.startswith("http"):
         return None
     ref = library.get("ref") or "main"
-    return f"{git.rstrip('/')}/blob/{ref}/{filename}"
+    source_path = filename
+    collection_root = library.get("root")
+    if (
+        library.get("subdir")
+        and collection_root
+        and (Path(str(collection_root)) / filename).is_file()
+    ):
+        source_path = _collection_source_path(library, filename)
+    return f"{git.rstrip('/')}/blob/{ref}/{source_path}"
+
+
+def _collection_source_path(library: dict[str, Any], *parts: str) -> str:
+    """Build a repository-relative source path for a configured collection."""
+    subdir = library.get("subdir") or ""
+    prefix = ""
+    if isinstance(subdir, str) and subdir:
+        prefix = "/".join(part for part in Path(subdir).parts if part not in {".", "/"})
+    return "/".join(part for part in (prefix, *parts) if part)
 
 
 def _jinja_env() -> Environment:

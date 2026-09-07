@@ -12,6 +12,8 @@ def test_badge_state_truth_table() -> None:
     assert badge_state(passing, "active")["state"] == "pass"
     assert badge_state(failing, "active")["state"] == "fail"
     assert badge_state(failing, "wip")["state"] == "report-only"
+    assert badge_state({"passed": False, "checks": []}, "active")["state"] == "fail"
+    assert badge_state({"passed": False, "checks": []}, "wip")["state"] == "report-only"
     assert badge_state(None, "active")["state"] == "not-validated"
 
 
@@ -41,4 +43,3 @@ def test_bom_csv_rows() -> None:
     assert rows[0]["count"] == "2"
     assert rows[0]["description"] == "2x4"
     assert rows[1]["material_class"] == "sheet"
-
