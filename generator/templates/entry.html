@@ -62,11 +62,19 @@
     {% endif %}
   </section>
 
+  {% if fixed_source_geometry %}
+  <section class="source-geometry-note" aria-label="Fixed source geometry">
+    <strong>Fixed source geometry</strong>
+    <p>This geometry is imported from a recorded source, not generated from adjustable parameters.</p>
+  </section>
+  {% endif %}
+
   <section aria-labelledby="parameters-heading">
     <div class="section-title">
       <h2 id="parameters-heading">Parameters</h2>
       <p><a href="{{ files.json }}">Download exported JSON</a> · <a href="{{ files.schema }}">schema.py</a> · <a href="{{ files.compiler }}">compiler.py</a></p>
     </div>
+    {% if parameters %}
     {% for group in parameters %}
     <h3>{{ group.name }}</h3>
     <div class="table-wrap">
@@ -80,6 +88,30 @@
       </table>
     </div>
     {% endfor %}
+    {% else %}
+    <p class="empty">No user-adjustable parameters are declared for this entry.</p>
+    {% endif %}
+    {% if source_components %}
+    <details class="source-components">
+      <summary>Source components ({{ source_component_count }})</summary>
+      <p>Component identity and source references are shown here. Full source records and hashes remain in the exported JSON.</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th scope="col">Label</th><th scope="col">Solids</th><th scope="col">Source object</th><th scope="col">Source file</th></tr></thead>
+          <tbody>
+            {% for component in source_components %}
+            <tr>
+              <th scope="row">{{ component.label }}</th>
+              <td>{{ component.solid_count }}</td>
+              <td><code>{{ component.source_object }}</code></td>
+              <td><code>{{ component.file }}</code></td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </details>
+    {% endif %}
   </section>
 
   <section aria-labelledby="fab-heading">

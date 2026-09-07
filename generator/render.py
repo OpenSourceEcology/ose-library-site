@@ -8,6 +8,7 @@ from typing import Any
 
 
 LAYER_ORDER = ("part", "module", "assembly", "structure")
+_SCHEMA_METADATA_KEYS = frozenset({"schema_name", "document_name", "source_parts"})
 
 
 def entry_to_dict(entry: Any) -> dict[str, Any]:
@@ -89,6 +90,8 @@ def parameter_groups(exported: dict[str, Any] | None) -> list[dict[str, Any]]:
     general_rows: list[dict[str, str]] = []
 
     for key, value in schema.items():
+        if key in _SCHEMA_METADATA_KEYS:
+            continue
         if isinstance(value, dict):
             groups.append({"name": _label(key), "rows": _flatten_mapping(value)})
         else:
@@ -97,6 +100,28 @@ def parameter_groups(exported: dict[str, Any] | None) -> list[dict[str, Any]]:
     if general_rows:
         groups.insert(0, {"name": "General", "rows": general_rows})
     return [group for group in groups if group["rows"]]
+
+
+def source_components(exported: dict[str, Any] | None) -> list[dict[str, str]]:
+    """Return concise source-component records without exposing their hashes inline."""
+    schema = (exported or {}).get("schema") or {}
+    parts = schema.get("source_parts")
+    if not isinstance(parts, list):
+        return []
+
+    rows = []
+    for index, part in enumerate(parts, start=1):
+        if not isinstance(part, dict):
+            continue
+        rows.append(
+            {
+                "label": str(part.get("label") or part.get("id") or f"Component {index}"),
+                "solid_count": format_value(part.get("solid_count")) or "—",
+                "source_object": str(part.get("source_object") or "—"),
+                "file": str(part.get("file") or "—"),
+            }
+        )
+    return rows
 
 
 def bom_rows(path: Path | None) -> list[dict[str, str]]:
@@ -130,6 +155,8 @@ def entry_page_context(
     expect = entry.get("expect", {})
     code_badge = badge_state(reports.get("code"), entry.get("status", meta.get("status", "")))
     output_badge = badge_state(reports.get("output"), entry.get("status", meta.get("status", "")))
+    geometry_mode = str(meta.get("geometry_mode") or "")
+    components = source_components(exported)
     return {
         "library": library,
         "entry": entry,
@@ -138,6 +165,9 @@ def entry_page_context(
         "exported": exported,
         "title": meta.get("title") or entry.get("id"),
         "parameters": parameter_groups(exported),
+        "source_components": components,
+        "source_component_count": len(components),
+        "fixed_source_geometry": geometry_mode.casefold().startswith("fixed_source"),
         "bom_rows": bom_rows(slots.get("bom_path")),
         "fab_svg": read_text(slots.get("fab_path")),
         "known_issues": meta.get("known_issues") or [],

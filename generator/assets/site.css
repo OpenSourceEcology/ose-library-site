@@ -349,6 +349,35 @@ dd {
   overflow-x: auto;
 }
 
+.source-geometry-note {
+  border-left: 4px solid var(--amber);
+  margin: 0 0 2rem;
+  padding: 0.7rem 0.9rem;
+}
+
+.source-geometry-note strong,
+.source-components summary {
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+}
+
+.source-geometry-note p,
+.source-components p {
+  color: var(--graphite);
+  margin: 0.35rem 0 0;
+}
+
+.source-components {
+  border-top: 1px solid var(--ink);
+  margin-top: 1.5rem;
+  padding-top: 0.7rem;
+}
+
+.source-components summary {
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
 table {
   border-collapse: collapse;
   width: 100%;
@@ -494,4 +523,3 @@ thead th {
     display: block;
   }
 }
-

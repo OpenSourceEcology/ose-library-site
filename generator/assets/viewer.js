@@ -13,6 +13,7 @@ for (const node of viewers) {
   scene.background = new THREE.Color(0xfbfaf7);
 
   const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 10000);
+  camera.up.set(0, 0, 1);
   camera.position.set(120, -180, 120);
 
   const renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -79,4 +80,3 @@ for (const node of viewers) {
   animate();
   window.addEventListener("resize", resize);
 }
-
